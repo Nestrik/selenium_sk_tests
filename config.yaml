@@ -1,0 +1,14 @@
+# browser config
+browser: "chrome"
+
+# project and staging config
+portal_page: "http://test-blizko.ru" # Главная портала
+normal_user_mail: "crow1@gmail.com" # Email Обычного пользователя
+normal_user_pwd: "0000" # Пароль обычного пользователя
+super_user_mail: "sunlf@yandex.ru" # SU email
+super_user_pwd: "82718951" # SU pass
+
+# other parameters
+
+
+# hardcoded parameters
