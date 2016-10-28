@@ -1,1 +1,3 @@
 /.idea/*
+*.log
+spec/rspec_html_reports/*
