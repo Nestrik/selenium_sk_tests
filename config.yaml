@@ -8,6 +8,8 @@ normal_user_pwd: "0000" # Пароль обычного пользователя
 super_user_mail: "sunlf@yandex.ru" # SU email
 super_user_pwd: "82718951" # SU pass
 super_user_enter_url: "http://all.test-blizko.ru/users/?uk=ba8dcf5c90717671751e749c0aab4b2c" # Прямая ссылка на вход через СЮ пользователя
+normal_user_enter_url: "http://all.test-blizko.ru/users/?uk=e67c1025d41274b02656c841cec6601e" # Прямая ссылка на вход через обычного пользователя
+sk_page: "http://sk-test.test-blizko.ru/" # Главная страница СК
 
 # other parameters
 
