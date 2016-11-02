@@ -1,6 +1,7 @@
 # main files
 require 'faker'
 require_relative '../pages/page'
+require 'selenium-webdriver'
 
 # page files
 

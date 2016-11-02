@@ -1,5 +1,4 @@
-class MenusEditPage
-  include PageObject
+class MenusEditPage < Page
   #BLIZKO
   page_url('http://test.test3-blizko.ru/settings')
 
@@ -30,5 +29,6 @@ class MenusEditPage
   # Элемент раздела Вертикальное меню
 
   # Элемент раздела Кастомизации
+
 
 end
