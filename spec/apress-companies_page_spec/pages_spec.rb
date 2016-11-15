@@ -6,8 +6,6 @@ describe 'Page edit' do
   let(:user_auth_admin) { Page::CONFIG['super_user_enter_url'].to_s }
   let(:user_auth_without_sk) { Page::CONFIG['normal_user_enter_url'].to_s }
   let(:sk_page) { Page::CONFIG['sk_page'].to_s }
-  let(:check_xpath) { PagesEdit.new }
-  let(:setting_toolbar) { @driver.find_element(:xpath, "//div[text()='Настройки']") }
 
   before :context do
     @driver = start_browser
@@ -19,13 +17,14 @@ describe 'Page edit' do
 
   context 'Check exist of entry point while role SU' do
 
-    before{
+    before do
       @driver.get user_auth_admin
       @driver.get sk_page
-    }
+      @driver.action.send_keys(:escape).perform
+    end
 
     it 'in setting' do
-      setting_toolbar.click
+      @driver.find_element(:xpath, "//div[text()='Настройки']").click
       expect(@driver.find_element(:xpath, "//a[text()='Добавить новую страницу']").displayed?).to be true
     end
 
@@ -37,10 +36,10 @@ describe 'Page edit' do
 
   context 'Check exist of entry point while role authorized user without sk' do
 
-    before{
+    before do
       @driver.get user_auth_without_sk
       @driver.get sk_page
-    }
+    end
 
     it 'button setting' do
       expect(@driver.find_element(:xpath, "div[text()='Настройки']")).to be nil

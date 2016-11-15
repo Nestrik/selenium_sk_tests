@@ -1,67 +1,61 @@
 require 'selenium-webdriver'
+require 'yaml'
 require 'page-object/platforms/selenium_webdriver/element'
 require 'page-object'
-require 'yaml'
+require 'active_support'
+
 
 class Page
   include PageObject
 
-  CONFIG = YAML.load_file('~/../config.yaml').freeze
+  # Берем файл main_config.yml по захардкоденому пути
+  common_config = YAML.load_file('~/../configs/main_config.yml')
+  stand = common_config['stand']
+  CONFIG = common_config.merge!(YAML.load_file("~/../configs/#{stand}.yml")).freeze
 
-  def initialize(root, visit = false)
-    super(root, visit)
+  # direct upload files via window upload dialog
+  def upload_file(element, file_path)
+    puts file_path
+    element.send_keys(file_path.tr('/', '\\'))
   end
 
-  def navigate_recent_company
-    recent_company_link = "#{CONFIG['portal_page']}/firms/new/approval"
-    navigate_to(recent_company_link)
+  # deal with ck editor text areas
+  def type_ck_editor(id, text)
+    execute_script("CKEDITOR.instances['#{id}'].insertText('#{text}');")
   end
 
-  def navigate_company_site(company_id)
-    navigate_to("#{CONFIG['portal_page']}/firms/#{company_id}")
-  end
-
-  def navigate_home
-    navigate_to(CONFIG['portal_page'])
-    self
-  end
-
+  # close all windows except current
   def close_other_windows
     cur_window = browser.window_handle
     browser.window_handles.each do |window|
-      unless window.eql? cur_window
-        browser.switch_to.window(window)
-        browser.close
-      end
+      next if window.eql?(cur_window)
+
+      browser.switch_to.window(window)
+      browser.close
     end
     browser.switch_to.window(cur_window)
   end
 
-  def navigate_admin_page
-    buf = CONFIG['portal_page'].dup
-    admin_address = buf.insert(7, 'admin.')
-    navigate_to(admin_address)
-    self
-  end
+  # switch to next window and close current
+  def switch_next_window
+    cur_window = browser.window_handle
+    browser.close
+    browser.window_handles.each do |window|
+      next if window.eql?(cur_window)
 
-  Selenium::WebDriver::Element.class_eval do
-    attr_reader :bridge, :id
-
-    def click
-      wait = Object::Selenium::WebDriver::Wait.new(timeout: 1, message: 'click failed')
-      wait.until do
-        begin
-          bridge.click_element id
-          true
-        rescue Exception => e
-          puts id
-          puts e.message
-          puts e.backtrace.inspect
-          false
-        end
-      end
+      browser.switch_to.window(window)
+      break
     end
   end
+
+  def navigate_to_admin_page
+    home_page = CONFIG['portal_page_url'].dup
+    admin_address = home_page.insert(7, 'admin.')
+    navigate_to(admin_address)
+  end
+
+  # Override selenium gem to make find element more exact. Selenium will try to find
+  # element for some time. Override click to ignore wrappers around element.
 
   Selenium::WebDriver::SearchContext.module_eval do
     # need for find_element reconstruction
@@ -92,33 +86,20 @@ class Page
 
     # standard element search with 10 seconds default
     def find_element(*args)
-      sleep 0.1
+      sleep 0.4
       how, what, timeout = extract_args(args)
       by = Selenium::WebDriver::SearchContext::FINDERS[how.to_sym]
       wait = Object::Selenium::WebDriver::Wait.new(timeout: timeout, message: 'element not found')
       wait.until do
-        element = bridge.find_element_by by, what.to_s, ref
-        !element.nil? && element.displayed? ? element : false
+        begin
+          bridge.find_element_by(by, what.to_s, ref)
+        rescue
+          false
+        end
       end
     rescue Selenium::WebDriver::Error::TimeOutError
-      puts "element not found #{how} #{what}" if timeout > 1
+      puts "element not found #{how} #{what}" if timeout > 3
       nil
-    end
-  end
-
-  # lets make 1 second {name}? waiting
-  PageObject::Accessors.module_eval do
-    def standard_methods(name, identifier, method, &block)
-      define_method("#{name}_element") do
-        return call_block(&block) if block_given?
-        platform.send(method, identifier.clone)
-      end
-      define_method("#{name}?") do
-        return call_block(&block).exists? if block_given?
-        how, what = PageObject::Elements::Element.selenium_identifier_for identifier.clone
-        element = browser.find_element(how, what, 1)
-        !element.nil?
-      end
     end
   end
 end

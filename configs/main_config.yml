@@ -1,17 +1,21 @@
-# browser config
-browser: "chrome"
+stand: test1
+browser: 'chrome'
+roles:
+  user:
+    email: ''
+    pwd: ''
+  admin:
+    email: ''
+    pwd: ''
+
 
 # project and staging config
 portal_page: "http://test-blizko.ru" # Главная портала
-normal_user_mail: "crow1@gmail.com" # Email Обычного пользователя
+normal_user_mail: "crow1@gmail.com" # Email Владельца СК
 normal_user_pwd: "0000" # Пароль обычного пользователя
 super_user_mail: "sunlf@yandex.ru" # SU email
 super_user_pwd: "82718951" # SU pass
 super_user_enter_url: "http://all.test-blizko.ru/users/?uk=ba8dcf5c90717671751e749c0aab4b2c" # Прямая ссылка на вход через СЮ пользователя
 normal_user_enter_url: "http://all.test-blizko.ru/users/?uk=e67c1025d41274b02656c841cec6601e" # Прямая ссылка на вход через обычного пользователя
 sk_page: "http://sk-test.test-blizko.ru/" # Главная страница СК
-
-# other parameters
-
-
-# hardcoded parameters
+create_company_url: 'http://www.test-blizko.ru/company_wizard/new'
